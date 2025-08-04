@@ -1,0 +1,150 @@
+import { AutoIncrement, BelongsTo, Column, DataType, ForeignKey, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import { Department } from 'src/settings/entities/department.entity';
+
+import { User } from 'src/users/entities/user.entity';
+import { TranscriptChanges } from './transcript-changes.entity';
+import { Transcript } from './transcripts-marks.entity';
+import { Faculty } from 'src/settings/entities/faculity.entity';
+
+@Table({ tableName: 'transcript_requests' })
+export class TranscriptRequest extends Model<TranscriptRequest> {
+    @PrimaryKey
+    @AutoIncrement
+    @Column
+    declare id: number;
+
+    @Column({
+        type: DataType.STRING,
+        allowNull: false,
+    })
+    regnumber: string;
+    
+    @Column({
+        type: DataType.STRING,
+        allowNull: false,
+    })
+    fullNames: string;
+
+    @ForeignKey(() => User)
+    @Column({
+        type: DataType.INTEGER,
+        allowNull: false,
+    })
+    requestedbyId: number;
+
+    @ForeignKey(() => Faculty)
+    @Column({
+        type: DataType.INTEGER,
+        allowNull: false,
+    })
+    facultyId: number;
+
+    @ForeignKey(() => Department)
+    @Column({
+        type: DataType.INTEGER,
+        allowNull: false,
+    })
+    departmentId: number;
+
+    @ForeignKey(() => User)
+    @Column({
+        type: DataType.INTEGER,
+        allowNull: true,
+    })
+    assignedToId: number;
+
+    @Column({
+        type: DataType.DATE,
+        allowNull: true,
+    })
+    completionYear: Date;
+
+    @Column({
+        type: DataType.STRING,
+        allowNull: false,
+    })
+    reason: string;
+
+    @Column({
+        type: DataType.TEXT,
+        allowNull: true,
+    })
+    description: string;
+
+    @Column({
+        type: DataType.STRING,
+        allowNull: true,
+    })
+    passphoto: string;
+
+    @Column({
+        type: DataType.STRING,
+        allowNull: true,
+    })
+    proofofpayment: string;
+
+    @Column({
+        type: DataType.STRING,
+        allowNull: true,
+    })
+    fileurl: string;
+
+    @Column({
+        type: DataType.ENUM('PENDING','PROCESSING', 'APPROVED', 'REJECTED'),
+        allowNull: false,
+    })
+    status: 'PENDING' | 'PROCESSING' | 'APPROVED' | 'REJECTED';
+
+    @Column({
+        type: DataType.STRING,
+        allowNull: false,
+    })
+    levelOfStudy: string;
+
+    // @Column({
+    //     type: DataType.BOOLEAN,
+    //     defaultValue: false,
+    // })
+    // marksReady: boolean;
+
+    // @Column({
+    //     type: DataType.DATE,
+    //     allowNull: true,
+    // })
+    // marksReadyAt: Date;
+
+    // @Column({
+    //     type: DataType.INTEGER,
+    //     allowNull: true,
+    // })
+    // marksPreparedById: number;
+
+    // @ForeignKey(() => Transcript)
+    // @Column({
+    //     type: DataType.INTEGER,
+    //     allowNull: true,
+    // })
+    // transcriptId: number;
+
+    //  @BelongsTo(() => User, { foreignKey: 'marksPreparedById' })
+    // marksPreparedBy: User;
+
+    // @BelongsTo(() => Transcript)
+    // transcript: Transcript;
+
+    @BelongsTo(() => User, { foreignKey: 'requestedbyId' })
+    requestedBy: User;
+
+    @BelongsTo(() => User, { foreignKey: 'assignedToId' })
+    assignedTo: User;
+
+    @BelongsTo(() => Faculty, { foreignKey: 'facultyId' })
+    faculty: Faculty;
+
+    @BelongsTo(() => Department, { foreignKey: 'departmentId' })
+    department: Department;
+
+    // Add any other associations or methods as needed
+    @HasMany(() => TranscriptChanges, { foreignKey: 'requestId' })
+    transcriptChanges: TranscriptChanges[];
+}
