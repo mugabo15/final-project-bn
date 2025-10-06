@@ -1,15 +1,41 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { CreateRecomandationRequestDto, CreateToWhomRequestDto, UpdateRecomandationRequestDto, UpdateRecomandationRequestStaffDto } from './dto/create-recomandation.dto';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import {
+  CreateRecomandationRequestDto,
+  CreateToWhomRequestDto,
+  UpdateRecomandationRequestDto,
+  UpdateRecomandationRequestStaffDto,
+} from './dto/create-recomandation.dto';
 import { UpdateDocumentRequestDto } from './dto/update-document-request.dto';
 import { Sequelize } from 'sequelize-typescript';
 import { RecommendationLetter } from './entities/recomandation-letter.entity';
-import { CreateTranscriptChangesDto, CreateTranscriptRequestDto, HodUpdateTranscriptRequestDto, UpdateTranscriptRequestDto } from './dto/create-transcript-request.dto';
+import {
+  CreateTranscriptChangesDto,
+  CreateTranscriptRequestDto,
+  HodUpdateTranscriptRequestDto,
+  UpdateTranscriptRequestDto,
+} from './dto/create-transcript-request.dto';
 import { TranscriptRequest } from './entities/transcript-request.entity';
 import { TranscriptChanges } from './entities/transcript-changes.entity';
-import { CreateEnglishCertificateChangesDto, CreateEnglishCertificateDto, UpdateEnglishCertificateRequestDto, UpdateEnglishCertificateRequestStaffDto } from './dto/create-english-certificate.dto';
+import {
+  CreateEnglishCertificateChangesDto,
+  CreateEnglishCertificateDto,
+  UpdateEnglishCertificateRequestDto,
+  UpdateEnglishCertificateRequestStaffDto,
+} from './dto/create-english-certificate.dto';
 import { EnglishCertificate } from './entities/english-certificate.entity';
 import { EnglishChanges } from './entities/english-changes.entity';
-import { CreateDeclarationChangeDto, CreateDeclarationProofOfPaymentDto, CreateDeclarationRequestDto, UpdateDeclarationRequestFinanceDto, UpdateDeclarationRequestLibraryDto, UpdateDeclarationRequestWelfareDto } from './dto/create-decration-request.dto';
+import {
+  CreateDeclarationChangeDto,
+  CreateDeclarationProofOfPaymentDto,
+  CreateDeclarationRequestDto,
+  UpdateDeclarationRequestFinanceDto,
+  UpdateDeclarationRequestLibraryDto,
+  UpdateDeclarationRequestWelfareDto,
+} from './dto/create-decration-request.dto';
 import { DeclarationCertificate } from './entities/declaration-certificate.entity';
 import { DeclarationChanges } from './entities/declaration-changes.entity';
 import { DeclarationProofOfPayment } from './entities/declaration-proof-of-payment.entity';
@@ -31,7 +57,7 @@ export class DocumentRequestService {
   constructor(
     private readonly sequelize: Sequelize,
     private readonly mailService: MailService, // Assuming you have a MailService for sending emails
-  ) { }
+  ) {}
   private get facultyRepository() {
     return this.sequelize.getRepository(Faculty); // Assuming Faculty is a model in your Sequelize setup
   }
@@ -50,7 +76,10 @@ export class DocumentRequestService {
   private get user() {
     return this.sequelize.getRepository(User);
   }
-  async createDocumentRequest(createDocumentRequestDto: CreateDocumentRequestDto, userId: number) {
+  async createDocumentRequest(
+    createDocumentRequestDto: CreateDocumentRequestDto,
+    userId: number,
+  ) {
     try {
       const userExist = await this.user.findByPk(userId);
       if (!userExist) {
@@ -58,7 +87,6 @@ export class DocumentRequestService {
       }
       console.log('document type;', createDocumentRequestDto.documentType);
       console.log('user exist', userExist.dataValues);
-
 
       const documentRequestData = {
         ...createDocumentRequestDto,
@@ -71,12 +99,16 @@ export class DocumentRequestService {
         faculty: userExist.dataValues.facultyId,
         department: userExist.dataValues.departmentId,
         idCard: userExist.dataValues.idCardNumber,
-        userId: userId
+        userId: userId,
       };
 
-      return await this.documentRequestRepository.create(documentRequestData as unknown as DocumentRequest);
+      return await this.documentRequestRepository.create(
+        documentRequestData as unknown as DocumentRequest,
+      );
     } catch (error) {
-      throw new InternalServerErrorException(`Failed to create document request: ${error.message}`);
+      throw new InternalServerErrorException(
+        `Failed to create document request: ${error.message}`,
+      );
     }
   }
 
@@ -84,39 +116,56 @@ export class DocumentRequestService {
     return this.documentRequestRepository.findAll({
       where: query,
       include: [
-        { model: this.facultyRepository, as: 'facultyId', attributes: ['name'] },
-        { model: this.departmentRepository, as: 'departmentId', attributes: ['name'] },
-        { model: User, as: 'user', attributes: ['firstName', 'lastName', 'email'] },
+        {
+          model: this.facultyRepository,
+          as: 'facultyId',
+          attributes: ['name'],
+        },
+        {
+          model: this.departmentRepository,
+          as: 'departmentId',
+          attributes: ['name'],
+        },
+        {
+          model: User,
+          as: 'user',
+          attributes: ['firstName', 'lastName', 'email'],
+        },
       ],
-      order: [['createdAt', 'DESC']]
+      order: [['createdAt', 'DESC']],
     });
   }
 
   async approveDocumentRequest(id: number, role: string) {
     const documentRequest = await this.documentRequestRepository.findByPk(id);
     if (!documentRequest) {
-      throw new BadRequestException(`Document request with ID #${id} not found.`);
+      throw new BadRequestException(
+        `Document request with ID #${id} not found.`,
+      );
     }
 
     type DocumentStatus =
-      | "pending"
-      | "approved"
-      | "rejected"
-      | "recoveryApproved"
-      | "recoveryRejected"
-      | "libraryApproved"
-      | "libraryRejected"
-      | "staffApproved"
-      | "staffRejected"
-      | "deanApproved"
-      | "deanRejected"
-      | "registrationApproved"
-      | "registrationRejected"
-      | "chancellorApproved"
-      | "chancellorRejected"
-      | "completed";
+      | 'pending'
+      | 'approved'
+      | 'rejected'
+      | 'recoveryApproved'
+      | 'recoveryRejected'
+      | 'libraryApproved'
+      | 'libraryRejected'
+      | 'staffApproved'
+      | 'staffRejected'
+      | 'deanApproved'
+      | 'deanRejected'
+      | 'registrationApproved'
+      | 'registrationRejected'
+      | 'chancellorApproved'
+      | 'chancellorRejected'
+      | 'completed';
 
-    const roleStatusMap: Record<string, { approved: DocumentStatus; rejected: DocumentStatus }> = {
+    const roleStatusMap: Record<
+      string,
+      { approved: DocumentStatus; rejected: DocumentStatus }
+    > = {
       recoveryOfficer: {
         approved: 'recoveryApproved',
         rejected: 'recoveryRejected',
@@ -145,7 +194,9 @@ export class DocumentRequestService {
 
     const statusMap = roleStatusMap[role];
     if (!statusMap) {
-      throw new BadRequestException(`Role '${role}' is not allowed to approve documents.`);
+      throw new BadRequestException(
+        `Role '${role}' is not allowed to approve documents.`,
+      );
     }
 
     // Update status only
@@ -157,7 +208,7 @@ export class DocumentRequestService {
   private formatDocumentType(type: string): string {
     return type
       .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(' ');
   }
 
@@ -167,7 +218,9 @@ export class DocumentRequestService {
   ) {
     const request = await this.documentRequestRepository.findByPk(id);
     if (!request) {
-      throw new BadRequestException(`Document request with ID #${id} not found.`);
+      throw new BadRequestException(
+        `Document request with ID #${id} not found.`,
+      );
     }
 
     if (!updateRecomandationRequestStaffDto.fileUrl) {
@@ -176,9 +229,10 @@ export class DocumentRequestService {
 
     const documentTypeRaw = request.dataValues.documentType || 'document';
     const documentTypeFormatted = this.formatDocumentType(documentTypeRaw); // see helper below
-    const userFullName = [request.dataValues.firstName, request.dataValues.lastName]
-      .filter(Boolean)
-      .join(' ') || 'Student';
+    const userFullName =
+      [request.dataValues.firstName, request.dataValues.lastName]
+        .filter(Boolean)
+        .join(' ') || 'Student';
 
     const subject = `Your ${documentTypeFormatted} is Now Available`;
 
@@ -202,7 +256,11 @@ export class DocumentRequestService {
     </div>
   `;
 
-    await this.mailService.sendMail(request.dataValues.email, subject, emailBody);
+    await this.mailService.sendMail(
+      request.dataValues.email,
+      subject,
+      emailBody,
+    );
 
     await request.update({
       fileUrl: updateRecomandationRequestStaffDto.fileUrl,
@@ -214,28 +272,33 @@ export class DocumentRequestService {
   async rejectDocumentRequest(id: number, role: string, reason?: string) {
     const documentRequest = await this.documentRequestRepository.findByPk(id);
     if (!documentRequest) {
-      throw new BadRequestException(`Document request with ID #${id} not found.`);
+      throw new BadRequestException(
+        `Document request with ID #${id} not found.`,
+      );
     }
 
     type DocumentStatus =
-      | "pending"
-      | "approved"
-      | "rejected"
-      | "recoveryApproved"
-      | "recoveryRejected"
-      | "libraryApproved"
-      | "libraryRejected"
-      | "staffApproved"
-      | "staffRejected"
-      | "deanApproved"
-      | "deanRejected"
-      | "registrationApproved"
-      | "registrationRejected"
-      | "chancellorApproved"
-      | "chancellorRejected"
-      | "completed";
+      | 'pending'
+      | 'approved'
+      | 'rejected'
+      | 'recoveryApproved'
+      | 'recoveryRejected'
+      | 'libraryApproved'
+      | 'libraryRejected'
+      | 'staffApproved'
+      | 'staffRejected'
+      | 'deanApproved'
+      | 'deanRejected'
+      | 'registrationApproved'
+      | 'registrationRejected'
+      | 'chancellorApproved'
+      | 'chancellorRejected'
+      | 'completed';
 
-    const roleStatusMap: Record<string, { approved: DocumentStatus; rejected: DocumentStatus }> = {
+    const roleStatusMap: Record<
+      string,
+      { approved: DocumentStatus; rejected: DocumentStatus }
+    > = {
       recoveryOfficer: {
         approved: 'recoveryApproved',
         rejected: 'recoveryRejected',
@@ -264,7 +327,9 @@ export class DocumentRequestService {
 
     const statusMap = roleStatusMap[role];
     if (!statusMap) {
-      throw new BadRequestException(`Role '${role}' is not allowed to reject documents.`);
+      throw new BadRequestException(
+        `Role '${role}' is not allowed to reject documents.`,
+      );
     }
 
     documentRequest.set('status', statusMap.rejected);
@@ -277,16 +342,16 @@ export class DocumentRequestService {
     return documentRequest;
   }
 
-  async createRecomandnation(createRecomandationRequestDto: CreateRecomandationRequestDto) {
+  async createRecomandnation(
+    createRecomandationRequestDto: CreateRecomandationRequestDto,
+  ) {
     // try {
     //   const existingRequest = await this.recomendationLetterRepository.findOne({
     //     where: { regnumber: createRecomandationRequestDto.regnumber, status: 'PENDING' },
     //   });
-
     //   if (existingRequest) {
     //     throw new BadRequestException('Sorry you still have pending request.');
     //   }
-
     //   return await this.recomendationLetterRepository.create({
     //     ...createRecomandationRequestDto,
     //     status: 'PENDING'
@@ -300,11 +365,9 @@ export class DocumentRequestService {
     //   const existingRequest = await this.toWhomLetterRepository.findOne({
     //     where: { regnumber: createToWhomRequestDto.regnumber, status: 'PENDING' },
     //   });
-
     //   if (existingRequest) {
     //     throw new BadRequestException('Sorry you still have pending request.');
     //   }
-
     //   return await this.toWhomLetterRepository.create({
     //     ...createToWhomRequestDto,
     //     status: 'PENDING'
@@ -314,31 +377,47 @@ export class DocumentRequestService {
     // }
   }
   async findAllToWhom(querry) {
-    return this.toWhomLetterRepository.findAll(
-      {
-        where: querry,
-        include: [
-          { model: this.facultyRepository, as: 'faculty', attributes: ['name'] },
-          { model: this.departmentRepository, as: 'department', attributes: ['name'] },
-          { model: User, as: 'requestedBy', attributes: ['firstName', 'lastName', 'email'] },
-          { model: User, as: 'assignedTo', attributes: ['firstName', 'lastName', 'email'] },
-        ],
-        order: [['createdAt', 'DESC']]
-      },
-
-    );
+    return this.toWhomLetterRepository.findAll({
+      where: querry,
+      include: [
+        { model: this.facultyRepository, as: 'faculty', attributes: ['name'] },
+        {
+          model: this.departmentRepository,
+          as: 'department',
+          attributes: ['name'],
+        },
+        {
+          model: User,
+          as: 'requestedBy',
+          attributes: ['firstName', 'lastName', 'email'],
+        },
+        {
+          model: User,
+          as: 'assignedTo',
+          attributes: ['firstName', 'lastName', 'email'],
+        },
+      ],
+      order: [['createdAt', 'DESC']],
+    });
   }
   async findOneToWhom(id: number) {
     const toWhom = await this.toWhomLetterRepository.findByPk(id);
     if (!toWhom) {
-      throw new BadRequestException(`To-whom-it-may-concern letter with ID #${id} not found.`);
+      throw new BadRequestException(
+        `To-whom-it-may-concern letter with ID #${id} not found.`,
+      );
     }
     return toWhom;
   }
-  async updateToWhomByStudent(id: number, updateRecomandationRequestDto: UpdateRecomandationRequestDto) {
+  async updateToWhomByStudent(
+    id: number,
+    updateRecomandationRequestDto: UpdateRecomandationRequestDto,
+  ) {
     const toWhom = await this.toWhomLetterRepository.findByPk(id);
     if (!toWhom) {
-      throw new BadRequestException(`To-whom-it-may-concern letter with ID #${id} not found.`);
+      throw new BadRequestException(
+        `To-whom-it-may-concern letter with ID #${id} not found.`,
+      );
     }
     await toWhom.update(updateRecomandationRequestDto);
     return toWhom;
@@ -384,34 +463,45 @@ export class DocumentRequestService {
   //   return toWhom;
   // }
   findAllRecomandations(querry) {
-    return this.recomendationLetterRepository.findAll(
-      {
-        where: querry,
-        include: [
-          { model: this.facultyRepository, as: 'faculty', attributes: ['name'] },
-          { model: this.departmentRepository, as: 'department', attributes: ['name'] },
-          { model: User, as: 'requestedBy', attributes: ['firstName', 'lastName', 'email'] },
-          { model: User, as: 'assignedTo', attributes: ['firstName', 'lastName', 'email'] },
-        ],
-        order: [['createdAt', 'DESC']]
-      },
-
-    );
+    return this.recomendationLetterRepository.findAll({
+      where: querry,
+      include: [
+        { model: this.facultyRepository, as: 'faculty', attributes: ['name'] },
+        {
+          model: this.departmentRepository,
+          as: 'department',
+          attributes: ['name'],
+        },
+        {
+          model: User,
+          as: 'requestedBy',
+          attributes: ['firstName', 'lastName', 'email'],
+        },
+        {
+          model: User,
+          as: 'assignedTo',
+          attributes: ['firstName', 'lastName', 'email'],
+        },
+      ],
+      order: [['createdAt', 'DESC']],
+    });
   }
 
-
-
-
   async findOne(id: number) {
-    const recommendation = await this.recomendationLetterRepository.findByPk(id);
+    const recommendation =
+      await this.recomendationLetterRepository.findByPk(id);
     if (!recommendation) {
       throw new BadRequestException(`Recommendation with ID #${id} not found.`);
     }
     return recommendation;
   }
 
-  async updateRecomandationByStudent(id: number, updateRecomandationRequestDto: UpdateRecomandationRequestDto) {
-    const recommendation = await this.recomendationLetterRepository.findByPk(id);
+  async updateRecomandationByStudent(
+    id: number,
+    updateRecomandationRequestDto: UpdateRecomandationRequestDto,
+  ) {
+    const recommendation =
+      await this.recomendationLetterRepository.findByPk(id);
     if (!recommendation) {
       throw new BadRequestException(`Recommendation with ID #${id} not found.`);
     }
@@ -419,16 +509,20 @@ export class DocumentRequestService {
     return recommendation;
   }
 
-
-
   private get transcriptRequestRepository() {
     return this.sequelize.getRepository(TranscriptRequest);
   }
 
-  async createTranscriptRequest(createTranscriptRequestDto: CreateTranscriptRequestDto) {
+  async createTranscriptRequest(
+    createTranscriptRequestDto: CreateTranscriptRequestDto,
+  ) {
     try {
       const existingRequest = await this.transcriptRequestRepository.findOne({
-        where: { regnumber: createTranscriptRequestDto.regnumber, levelOfStudy: createTranscriptRequestDto.levelOfStudy, status: 'PENDING' },
+        where: {
+          regnumber: createTranscriptRequestDto.regnumber,
+          levelOfStudy: createTranscriptRequestDto.levelOfStudy,
+          status: 'PENDING',
+        },
       });
 
       if (existingRequest) {
@@ -440,19 +534,25 @@ export class DocumentRequestService {
       //   status: 'PENDING'
       // } as TranscriptRequest);
     } catch (error) {
-      throw new BadRequestException(`Failed to create transcript request: ${error.message}`);
+      throw new BadRequestException(
+        `Failed to create transcript request: ${error.message}`,
+      );
     }
   }
   private get transcriptChangesRepository() {
     return this.sequelize.getRepository(TranscriptChanges);
   }
-  async createChangesOnTranscriptRequest(createTranscriptChangesDto: CreateTranscriptChangesDto) {
+  async createChangesOnTranscriptRequest(
+    createTranscriptChangesDto: CreateTranscriptChangesDto,
+  ) {
     try {
-
-
-      const transcriptRequest = await this.transcriptRequestRepository.findByPk(createTranscriptChangesDto.requestId);
+      const transcriptRequest = await this.transcriptRequestRepository.findByPk(
+        createTranscriptChangesDto.requestId,
+      );
       if (!transcriptRequest) {
-        throw new BadRequestException(`Transcript request with ID #${createTranscriptChangesDto.requestId} not found.`);
+        throw new BadRequestException(
+          `Transcript request with ID #${createTranscriptChangesDto.requestId} not found.`,
+        );
       }
 
       const transcriptChange = await this.transcriptChangesRepository.create({
@@ -461,26 +561,35 @@ export class DocumentRequestService {
 
       return transcriptChange;
     } catch (error) {
-      throw new BadRequestException(`Failed to create changes on transcript request: ${error.message}`);
+      throw new BadRequestException(
+        `Failed to create changes on transcript request: ${error.message}`,
+      );
     }
   }
 
   private get transcriptModel() {
     return this.sequelize.getRepository(Transcript); // Assuming TranscriptRequest is also a TranscriptRequest
   }
-  async HodUpdateTranscriptRequest(userId: number, updateDocumentRequestDto: HodUpdateTranscriptRequestDto) {
+  async HodUpdateTranscriptRequest(
+    userId: number,
+    updateDocumentRequestDto: HodUpdateTranscriptRequestDto,
+  ) {
     const transcriptRequest = await this.transcriptRequestRepository.findOne({
       where: { id: updateDocumentRequestDto.requestId, status: 'PENDING' },
     });
 
     if (!transcriptRequest) {
-      throw new BadRequestException(`Transcript request with ID #${updateDocumentRequestDto.requestId} not found or already processed.`);
+      throw new BadRequestException(
+        `Transcript request with ID #${updateDocumentRequestDto.requestId} not found or already processed.`,
+      );
     }
     const transcriptExists = await this.transcriptModel.findOne({
-      where: { id: updateDocumentRequestDto.transcriptId, },
-    },);
+      where: { id: updateDocumentRequestDto.transcriptId },
+    });
     if (!transcriptExists) {
-      throw new BadRequestException(`Transcript with ID #${updateDocumentRequestDto.transcriptId} not found.`);
+      throw new BadRequestException(
+        `Transcript with ID #${updateDocumentRequestDto.transcriptId} not found.`,
+      );
     }
     const user = await this.sequelize.getRepository(User).findByPk(userId);
     if (!user) {
@@ -502,18 +611,25 @@ export class DocumentRequestService {
     return 'Transcript request Approved successfully';
   }
 
-  async deanUpdateTranscriptRequest(userId: number, updateDocumentRequestDto: HodUpdateTranscriptRequestDto) {
+  async deanUpdateTranscriptRequest(
+    userId: number,
+    updateDocumentRequestDto: HodUpdateTranscriptRequestDto,
+  ) {
     const transcriptRequest = await this.transcriptRequestRepository.findOne({
       where: { id: updateDocumentRequestDto.requestId, status: 'PROCESSING' },
     });
     if (!transcriptRequest) {
-      throw new BadRequestException(`Transcript request with ID #${updateDocumentRequestDto.requestId} not found or already processed.`);
+      throw new BadRequestException(
+        `Transcript request with ID #${updateDocumentRequestDto.requestId} not found or already processed.`,
+      );
     }
     const transcriptExists = await this.transcriptModel.findOne({
-      where: { id: updateDocumentRequestDto.transcriptId, },
-    },);
+      where: { id: updateDocumentRequestDto.transcriptId },
+    });
     if (!transcriptExists) {
-      throw new BadRequestException(`Transcript with ID #${updateDocumentRequestDto.transcriptId} not found.`);
+      throw new BadRequestException(
+        `Transcript with ID #${updateDocumentRequestDto.transcriptId} not found.`,
+      );
     }
     const user = await this.sequelize.getRepository(User).findByPk(userId);
     if (!user) {
@@ -540,43 +656,62 @@ export class DocumentRequestService {
     // await transcriptExists.save();
 
     // return 'Transcript request Approved successfully';
-
   }
 
-
-
   async findAllTranscriptRequest(querry) {
-    return this.transcriptRequestRepository.findAll({ where: querry, order: [['createdAt', 'DESC']] }
-
-    );
+    return this.transcriptRequestRepository.findAll({
+      where: querry,
+      order: [['createdAt', 'DESC']],
+    });
   }
 
   async findOneRequest(id: number) {
-    const transcriptRequest = await this.transcriptRequestRepository.findByPk(id, {
-      include: [
-        { model: this.transcriptChangesRepository, as: 'transcriptChanges' },
-        { model: this.facultyRepository, as: 'faculty', attributes: ['name'] },
-        { model: this.departmentRepository, as: 'department', attributes: ['name'] },
-      ],
-    });
+    const transcriptRequest = await this.transcriptRequestRepository.findByPk(
+      id,
+      {
+        include: [
+          { model: this.transcriptChangesRepository, as: 'transcriptChanges' },
+          {
+            model: this.facultyRepository,
+            as: 'faculty',
+            attributes: ['name'],
+          },
+          {
+            model: this.departmentRepository,
+            as: 'department',
+            attributes: ['name'],
+          },
+        ],
+      },
+    );
     if (!transcriptRequest) {
-      throw new BadRequestException(`Transcript request with ID #${id} not found.`);
+      throw new BadRequestException(
+        `Transcript request with ID #${id} not found.`,
+      );
     }
     return transcriptRequest;
   }
 
   async updateTranscriptFileUrl(id: number, fileUrl: string) {
-    const transcriptRequest = await this.transcriptRequestRepository.findOne({ where: { id } });
+    const transcriptRequest = await this.transcriptRequestRepository.findOne({
+      where: { id },
+    });
     if (!transcriptRequest) {
-      throw new BadRequestException(`Transcript request with ID #${id} not found.`);
+      throw new BadRequestException(
+        `Transcript request with ID #${id} not found.`,
+      );
     }
     // console.log('transcriptRequest', transcriptRequest.dataValues);
-    const transcriptData = transcriptRequest.dataValues
+    const transcriptData = transcriptRequest.dataValues;
     console.log('transcript', transcriptData.regnumber);
 
-    const user = await this.sequelize.getRepository(User).findOne({ where: { regNumber: transcriptData.regnumber } });
+    const user = await this.sequelize
+      .getRepository(User)
+      .findOne({ where: { regNumber: transcriptData.regnumber } });
     if (!user) {
-      throw new BadRequestException(`Student with RegNumber #${transcriptRequest.regnumber} not found.`);
+      throw new BadRequestException(
+        `Student with RegNumber #${transcriptRequest.regnumber} not found.`,
+      );
     }
     transcriptRequest.set('fileurl', fileUrl);
     await transcriptRequest.save();
@@ -604,26 +739,30 @@ export class DocumentRequestService {
 
       <p>Best regards,<br/>The UniDoc Team</p>
     </div>
-  `
+  `,
     );
 
     return transcriptRequest;
   }
-  async updateTranscriptRequestByStaff(id: number, updateDocumentRequestDto: UpdateTranscriptRequestDto) {
-    const transcriptRequest = await this.transcriptRequestRepository.findByPk(id);
+  async updateTranscriptRequestByStaff(
+    id: number,
+    updateDocumentRequestDto: UpdateTranscriptRequestDto,
+  ) {
+    const transcriptRequest =
+      await this.transcriptRequestRepository.findByPk(id);
     if (!transcriptRequest) {
-      throw new BadRequestException(`Transcript request with ID #${id} not found.`);
+      throw new BadRequestException(
+        `Transcript request with ID #${id} not found.`,
+      );
     }
 
     await transcriptRequest.update(updateDocumentRequestDto);
     return transcriptRequest;
   }
 
-
   async createTranscript(dto: CreateTranscriptDto): Promise<any> {
     try {
-
-      const transcript = await this.transcriptModel.create({ ...dto as any });
+      const transcript = await this.transcriptModel.create({ ...(dto as any) });
       return transcript;
     } catch (error) {
       throw new BadRequestException(` ${error.message}`);
@@ -641,8 +780,7 @@ export class DocumentRequestService {
   }
 
   async findTranscrip(querry) {
-    return this.transcriptModel.findAll({ where: querry }
-    );
+    return this.transcriptModel.findAll({ where: querry });
   }
   async findUploadedMarksSummary() {
     // Group by the specified fields and count the number of records in each group
@@ -653,15 +791,21 @@ export class DocumentRequestService {
         'program',
         'yearOfStudyName',
         'yearOfStudyYear',
-        [this.sequelize.fn('COUNT', this.sequelize.col('id')), 'numberOfRecords'],
-        [this.sequelize.fn('MAX', this.sequelize.col('createdAt')), 'uploadedDate'],
+        [
+          this.sequelize.fn('COUNT', this.sequelize.col('id')),
+          'numberOfRecords',
+        ],
+        [
+          this.sequelize.fn('MAX', this.sequelize.col('createdAt')),
+          'uploadedDate',
+        ],
       ],
       group: [
         'schoolId',
         'departmentId',
         'program',
         'yearOfStudyName',
-        'yearOfStudyYear'
+        'yearOfStudyYear',
       ],
       raw: true,
       order: [
@@ -669,7 +813,7 @@ export class DocumentRequestService {
         ['departmentId', 'DESC'],
         ['program', 'DESC'],
         ['yearOfStudyName', 'DESC'],
-        ['yearOfStudyYear', 'DESC']
+        ['yearOfStudyYear', 'DESC'],
       ],
     });
 
@@ -678,7 +822,9 @@ export class DocumentRequestService {
   private get englishCertificateRepository() {
     return this.sequelize.getRepository(EnglishCertificate); // Assuming EnglishCertificate is also a TranscriptRequest
   }
-  async createEnglishCertificateRequest(createEnglishCertificateDto: CreateEnglishCertificateDto) {
+  async createEnglishCertificateRequest(
+    createEnglishCertificateDto: CreateEnglishCertificateDto,
+  ) {
     // try {
     //   const existingRequest = await this.englishCertificateRepository.findOne({
     //     where: { regnumber: createEnglishCertificateDto.regnumber, status: 'PENDING' },
@@ -686,8 +832,6 @@ export class DocumentRequestService {
     //   if (existingRequest) {
     //     throw new BadRequestException('Sorry you still have pending request.');
     //   }
-
-
     //   return await this.englishCertificateRepository.create({
     //     ...createEnglishCertificateDto,
     //     status: 'PENDING'
@@ -698,34 +842,52 @@ export class DocumentRequestService {
   }
 
   async findAllEnglishCertificateRequest(querry) {
-    return this.englishCertificateRepository.findAll({ where: querry }
-    );
+    return this.englishCertificateRepository.findAll({ where: querry });
   }
   async findOneEnglishCertificateRequest(id: number) {
-    const englishCertificateRequest = await this.englishCertificateRepository.findByPk(id, {
-      include: [
-        { model: this.englishChangesRepository, as: 'englishChanges', attributes: ['comment'] },
-      ],
-    });
+    const englishCertificateRequest =
+      await this.englishCertificateRepository.findByPk(id, {
+        include: [
+          {
+            model: this.englishChangesRepository,
+            as: 'englishChanges',
+            attributes: ['comment'],
+          },
+        ],
+      });
     if (!englishCertificateRequest) {
-      throw new BadRequestException(`English certificate request with ID #${id} not found.`);
+      throw new BadRequestException(
+        `English certificate request with ID #${id} not found.`,
+      );
     }
     return englishCertificateRequest;
   }
-  async updateEnglishCertificateRequestStaff(id: number, updateDocumentRequestDto: UpdateEnglishCertificateRequestStaffDto) {
-    const englishCertificateRequest = await this.englishCertificateRepository.findByPk(id);
+  async updateEnglishCertificateRequestStaff(
+    id: number,
+    updateDocumentRequestDto: UpdateEnglishCertificateRequestStaffDto,
+  ) {
+    const englishCertificateRequest =
+      await this.englishCertificateRepository.findByPk(id);
     if (!englishCertificateRequest) {
-      throw new BadRequestException(`English certificate request with ID #${id} not found.`);
+      throw new BadRequestException(
+        `English certificate request with ID #${id} not found.`,
+      );
     }
-    updateDocumentRequestDto.status = 'APPROVED'
+    updateDocumentRequestDto.status = 'APPROVED';
     englishCertificateRequest.set('status', 'APPROVED');
     await englishCertificateRequest.update(updateDocumentRequestDto);
     return englishCertificateRequest;
   }
-  async updateEnglishCertificateRequestStudent(id: number, updateDocumentRequestDto: UpdateEnglishCertificateRequestDto) {
-    const englishCertificateRequest = await this.englishCertificateRepository.findByPk(id);
+  async updateEnglishCertificateRequestStudent(
+    id: number,
+    updateDocumentRequestDto: UpdateEnglishCertificateRequestDto,
+  ) {
+    const englishCertificateRequest =
+      await this.englishCertificateRepository.findByPk(id);
     if (!englishCertificateRequest) {
-      throw new BadRequestException(`English certificate request with ID #${id} not found.`);
+      throw new BadRequestException(
+        `English certificate request with ID #${id} not found.`,
+      );
     }
     await englishCertificateRequest.update(updateDocumentRequestDto);
     return englishCertificateRequest;
@@ -734,11 +896,18 @@ export class DocumentRequestService {
   private get englishChangesRepository() {
     return this.sequelize.getRepository(EnglishChanges); // Assuming EnglishChanges is also a TranscriptRequest
   }
-  async createChangesOnEnglishCertificateRequest(createEnglishCertificateChangesDto: CreateEnglishCertificateChangesDto) {
+  async createChangesOnEnglishCertificateRequest(
+    createEnglishCertificateChangesDto: CreateEnglishCertificateChangesDto,
+  ) {
     try {
-      const englishCertificateRequest = await this.englishCertificateRepository.findByPk(createEnglishCertificateChangesDto.requestId);
+      const englishCertificateRequest =
+        await this.englishCertificateRepository.findByPk(
+          createEnglishCertificateChangesDto.requestId,
+        );
       if (!englishCertificateRequest) {
-        throw new BadRequestException(`English certificate request with ID #${createEnglishCertificateChangesDto.requestId} not found.`);
+        throw new BadRequestException(
+          `English certificate request with ID #${createEnglishCertificateChangesDto.requestId} not found.`,
+        );
       }
 
       const englishChange = await this.englishChangesRepository.create({
@@ -746,14 +915,18 @@ export class DocumentRequestService {
       } as EnglishChanges);
       return englishChange;
     } catch (error) {
-      throw new BadRequestException(`Failed to create changes on English certificate request: ${error.message}`);
+      throw new BadRequestException(
+        `Failed to create changes on English certificate request: ${error.message}`,
+      );
     }
   }
 
   private get declarationCertificateRepository() {
     return this.sequelize.getRepository(DeclarationCertificate); // Assuming EnglishCertificate is also a TranscriptRequest
   }
-  async createDeclarationCertificateRequest(createDeclarationRequestDto: CreateDeclarationRequestDto) {
+  async createDeclarationCertificateRequest(
+    createDeclarationRequestDto: CreateDeclarationRequestDto,
+  ) {
     // try {
     //   const existingRequest = await this.englishCertificateRepository.findOne({
     //     where: { regnumber: createDeclarationRequestDto.regnumber, status: 'PENDING' },
@@ -761,8 +934,6 @@ export class DocumentRequestService {
     //   if (existingRequest) {
     //     throw new BadRequestException('Sorry you still have pending request.');
     //   }
-
-
     //   return await this.declarationCertificateRepository.create({
     //     ...createDeclarationRequestDto,
     //     libraryStatus: 'PENDING',
@@ -780,20 +951,28 @@ export class DocumentRequestService {
   private get declarationProofOfPaymentRepository() {
     return this.sequelize.getRepository(DeclarationProofOfPayment); // Assuming EnglishChanges is also a TranscriptRequest
   }
-  async createChangesOnDeclarationCertificateRequest(createDeclarationChangeDto: CreateDeclarationChangeDto) {
+  async createChangesOnDeclarationCertificateRequest(
+    createDeclarationChangeDto: CreateDeclarationChangeDto,
+  ) {
     try {
-      const englishCertificateRequest = await this.declarationCertificateRepository.findByPk(createDeclarationChangeDto.requestId);
+      const englishCertificateRequest =
+        await this.declarationCertificateRepository.findByPk(
+          createDeclarationChangeDto.requestId,
+        );
       if (!englishCertificateRequest) {
-        throw new BadRequestException(`declation certificate request with ID #${createDeclarationChangeDto.requestId} not found.`);
+        throw new BadRequestException(
+          `declation certificate request with ID #${createDeclarationChangeDto.requestId} not found.`,
+        );
       }
 
       const declarationChange = await this.declarationChangesRepository.create({
         ...createDeclarationChangeDto,
-
       } as DeclarationChanges);
 
       if (!declarationChange) {
-        throw new BadRequestException(`Failed to create changes on declation certificate request.`);
+        throw new BadRequestException(
+          `Failed to create changes on declation certificate request.`,
+        );
       }
       // Update the request status based on the changes
       if (createDeclarationChangeDto.from === 'LIBRARY') {
@@ -808,72 +987,110 @@ export class DocumentRequestService {
       await englishCertificateRequest.save();
       return declarationChange;
     } catch (error) {
-      throw new BadRequestException(`Failed to create changes on declation certificate request: ${error.message}`);
+      throw new BadRequestException(
+        `Failed to create changes on declation certificate request: ${error.message}`,
+      );
     }
   }
   async findAllDeclarationRequest(querry) {
-    return this.declarationCertificateRepository.findAll({ where: querry }
-    );
+    return this.declarationCertificateRepository.findAll({ where: querry });
   }
   async findOneDeclarationRequest(id: number) {
-    const declationRequest = await this.declarationCertificateRepository.findByPk(id, {
-      include: [
-        { model: this.declarationChangesRepository, as: 'declarationChanges', attributes: ['from', 'comment'] },
-        { model: this.declarationProofOfPaymentRepository, as: 'declarationProofOfPayment', attributes: ['to', 'proofOfpaymentUrl'] },
-
-      ],
-    });
+    const declationRequest =
+      await this.declarationCertificateRepository.findByPk(id, {
+        include: [
+          {
+            model: this.declarationChangesRepository,
+            as: 'declarationChanges',
+            attributes: ['from', 'comment'],
+          },
+          {
+            model: this.declarationProofOfPaymentRepository,
+            as: 'declarationProofOfPayment',
+            attributes: ['to', 'proofOfpaymentUrl'],
+          },
+        ],
+      });
     if (!declationRequest) {
-      throw new BadRequestException(`Declation request with ID #${id} not found.`);
+      throw new BadRequestException(
+        `Declation request with ID #${id} not found.`,
+      );
     }
     return declationRequest;
   }
 
-  async createProofOfPayment(id: number, createProofOfPaymentDto: CreateDeclarationProofOfPaymentDto) {
+  async createProofOfPayment(
+    id: number,
+    createProofOfPaymentDto: CreateDeclarationProofOfPaymentDto,
+  ) {
     try {
-      const declationRequest = await this.declarationCertificateRepository.findByPk(id);
+      const declationRequest =
+        await this.declarationCertificateRepository.findByPk(id);
       if (!declationRequest) {
-        throw new BadRequestException(`Declation request with ID #${id} not found.`);
+        throw new BadRequestException(
+          `Declation request with ID #${id} not found.`,
+        );
       }
       createProofOfPaymentDto.requestId = id;
       const requestId = createProofOfPaymentDto.requestId;
-      const proofOfPayment = await this.declarationProofOfPaymentRepository.create({
-        ...createProofOfPaymentDto,
-        requestId
-      } as DeclarationProofOfPayment);
+      const proofOfPayment =
+        await this.declarationProofOfPaymentRepository.create({
+          ...createProofOfPaymentDto,
+          requestId,
+        } as DeclarationProofOfPayment);
       return proofOfPayment;
     } catch (error) {
-      throw new BadRequestException(`Failed to create proof of payment: ${error.message}`);
+      throw new BadRequestException(
+        `Failed to create proof of payment: ${error.message}`,
+      );
     }
   }
 
-  async updateDeclarationRequestLibrary(id: number, updateDocumentRequestDto: UpdateDeclarationRequestLibraryDto) {
-    const declationRequest = await this.declarationCertificateRepository.findByPk(id);
+  async updateDeclarationRequestLibrary(
+    id: number,
+    updateDocumentRequestDto: UpdateDeclarationRequestLibraryDto,
+  ) {
+    const declationRequest =
+      await this.declarationCertificateRepository.findByPk(id);
     if (!declationRequest) {
-      throw new BadRequestException(`Declation request with ID #${id} not found.`);
+      throw new BadRequestException(
+        `Declation request with ID #${id} not found.`,
+      );
     }
-    updateDocumentRequestDto.libraryStatus = 'APPROVED'
+    updateDocumentRequestDto.libraryStatus = 'APPROVED';
     declationRequest.set('libraryStatus', 'APPROVED');
     await declationRequest.update(updateDocumentRequestDto);
     return declationRequest;
   }
 
-  async updateDeclarationRequestFinance(id: number, updateDocumentRequestDto: UpdateDeclarationRequestFinanceDto) {
-    const declationRequest = await this.declarationCertificateRepository.findByPk(id);
+  async updateDeclarationRequestFinance(
+    id: number,
+    updateDocumentRequestDto: UpdateDeclarationRequestFinanceDto,
+  ) {
+    const declationRequest =
+      await this.declarationCertificateRepository.findByPk(id);
     if (!declationRequest) {
-      throw new BadRequestException(`Declation request with ID #${id} not found.`);
+      throw new BadRequestException(
+        `Declation request with ID #${id} not found.`,
+      );
     }
-    updateDocumentRequestDto.financeStatus = 'APPROVED'
+    updateDocumentRequestDto.financeStatus = 'APPROVED';
     declationRequest.set('financeStatus', 'APPROVED');
     await declationRequest.update(updateDocumentRequestDto);
     return declationRequest;
   }
-  async updateDeclarationRequestWelfare(id: number, updateDocumentRequestDto: UpdateDeclarationRequestWelfareDto) {
-    const declationRequest = await this.declarationCertificateRepository.findByPk(id);
+  async updateDeclarationRequestWelfare(
+    id: number,
+    updateDocumentRequestDto: UpdateDeclarationRequestWelfareDto,
+  ) {
+    const declationRequest =
+      await this.declarationCertificateRepository.findByPk(id);
     if (!declationRequest) {
-      throw new BadRequestException(`Declation request with ID #${id} not found.`);
+      throw new BadRequestException(
+        `Declation request with ID #${id} not found.`,
+      );
     }
-    updateDocumentRequestDto.welfareStatus = 'APPROVED'
+    updateDocumentRequestDto.welfareStatus = 'APPROVED';
     declationRequest.set('welfareStatus', 'APPROVED');
     await declationRequest.update(updateDocumentRequestDto);
     return declationRequest;

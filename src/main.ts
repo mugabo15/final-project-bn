@@ -3,9 +3,10 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { HttpExceptionFilter } from './utils/exceptions';
+import * as bodyParser from 'body-parser';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { rawBody: true });
 
   app.enableCors({
     origin: 'http://localhost:5173', // frontend URL
@@ -32,6 +33,12 @@ async function bootstrap() {
       persistAuthorization: true,
     },
   });
+
+  // app.use(
+  //   bodyParser.raw({
+  //     type: 'application/json',
+  //   }),
+  // );
 
   await app.listen(process.env.PORT ?? 7000);
   console.log('🚀 Server running on http://localhost:7000');

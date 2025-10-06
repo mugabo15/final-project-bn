@@ -13,7 +13,6 @@ import { Department } from 'src/settings/entities/department.entity';
 import { Faculty } from 'src/settings/entities/faculity.entity';
 import { User } from 'src/users/entities/user.entity';
 
-
 @Table({ tableName: 'document_request' })
 export class DocumentRequest extends Model<DocumentRequest> {
   @PrimaryKey
@@ -21,10 +20,25 @@ export class DocumentRequest extends Model<DocumentRequest> {
   @Column
   declare id: number;
   @Column({
-    type: DataType.ENUM('transcript', 'recommendation', 'to whom', 'certificate of attendance', 'proof of english', 'internship', 'degree diploma'),
+    type: DataType.ENUM(
+      'transcript',
+      'recommendation',
+      'to whom',
+      'certificate of attendance',
+      'proof of english',
+      'internship',
+      'degree diploma',
+    ),
     allowNull: false,
   })
-  documentType: 'transcript' | 'recommendation' | 'to whom' | 'certificate of attendance' | 'proof of english' | 'internship' | 'degree diploma';
+  documentType:
+    | 'transcript'
+    | 'recommendation'
+    | 'to whom'
+    | 'certificate of attendance'
+    | 'proof of english'
+    | 'internship'
+    | 'degree diploma';
 
   @ForeignKey(() => User)
   @Column({ type: DataType.INTEGER })
@@ -59,6 +73,12 @@ export class DocumentRequest extends Model<DocumentRequest> {
   @Column({ type: DataType.STRING })
   program: string;
 
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: true,
+  })
+  price: number;
+
   @Column({ type: DataType.STRING })
   level: string;
 
@@ -77,19 +97,48 @@ export class DocumentRequest extends Model<DocumentRequest> {
   @Column({ type: DataType.STRING, allowNull: true })
   fileUrl: string;
 
-
   @Column({
-    type: DataType.ENUM('pending', 'approved', 'rejected', 'recoveryApproved', 'recoveryRejected', 'libraryApproved', 'libraryRejected', 'staffApproved', 'staffRejected', 'deanApproved', 'deanRejected', 'registrationApproved', 'registrationRejected', 'chancellorApproved', 'chancellorRejected', 'completed'),
+    type: DataType.ENUM(
+      'pending',
+      'approved',
+      'rejected',
+      'recoveryApproved',
+      'recoveryRejected',
+      'libraryApproved',
+      'libraryRejected',
+      'staffApproved',
+      'staffRejected',
+      'deanApproved',
+      'deanRejected',
+      'registrationApproved',
+      'registrationRejected',
+      'chancellorApproved',
+      'chancellorRejected',
+      'completed',
+    ),
     defaultValue: 'pending',
   })
-  status: 'pending' | 'approved' | 'rejected' | 'recoveryApproved' | 'recoveryRejected' | 'libraryApproved' | 'libraryRejected' | 'staffApproved' | 'staffRejected' | 'deanApproved' | 'deanRejected' | 'registrationApproved' | 'registrationRejected' | 'chancellorApproved' | 'chancellorRejected' | 'completed';
+  status:
+    | 'pending'
+    | 'approved'
+    | 'rejected'
+    | 'recoveryApproved'
+    | 'recoveryRejected'
+    | 'libraryApproved'
+    | 'libraryRejected'
+    | 'staffApproved'
+    | 'staffRejected'
+    | 'deanApproved'
+    | 'deanRejected'
+    | 'registrationApproved'
+    | 'registrationRejected'
+    | 'chancellorApproved'
+    | 'chancellorRejected'
+    | 'completed';
 
   @Column({
     type: DataType.STRING,
     allowNull: true,
-
   })
-  reason: string
-
-
+  reason: string;
 }

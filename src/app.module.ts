@@ -15,6 +15,7 @@ import { User } from './users/entities/user.entity';
 import { Department } from './settings/entities/department.entity';
 import { Campus } from './settings/entities/campus.entity';
 import { Faculty } from './settings/entities/faculity.entity';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
@@ -45,13 +46,14 @@ import { Faculty } from './settings/entities/faculity.entity';
     DocumentRequestModule,
     AuthModule,
     MailModule,
+    PaymentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {
   constructor() {
-    const sequelize = new (require('sequelize')).Sequelize({
+    const sequelize = new (require('sequelize').Sequelize)({
       dialect: 'postgres',
       host: process.env.DB_HOST,
       port: parseInt(process.env.DB_PORT || '5432', 10),

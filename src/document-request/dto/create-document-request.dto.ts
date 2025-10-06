@@ -1,10 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsEnum,
-  IsString,
-  IsOptional,
-  IsArray,
-} from 'class-validator';
+import { IsEnum, IsString, IsOptional, IsArray } from 'class-validator';
 // src/common/enums/document-type.enum.ts
 export enum DocumentTypeEnum {
   TRANSCRIPT = 'transcript',
@@ -15,7 +10,6 @@ export enum DocumentTypeEnum {
   INTERNSHIP = 'internship',
   DEGREE_DIPLOMA = 'degree diploma',
 }
-
 
 export class CreateDocumentRequestDto {
   @ApiProperty({ enum: DocumentTypeEnum })
@@ -38,33 +32,37 @@ export class CreateDocumentRequestDto {
 
   @ApiProperty({ required: false })
   @IsOptional()
+  price: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
   @IsString()
   courseName?: string;
 
-//   @ApiProperty({
-//     required: false,
-//     type: 'array',
-//     items: {
-//       type: 'object',
-//       properties: {
-//         level: {
-//           type: 'string',
-//           enum: [
-//             'recoveryOfficer',
-//             'library',
-//             'staff',
-//             'dean',
-//             'registrationOfficer',
-//             'chancellor',
-//             'completed',
-//           ],
-//         },
-//         userId: { type: 'number' },
-//         approvedAt: { type: 'string', format: 'date-time' },
-//         comment: { type: 'string' },
-//       },
-//     },
-//   })
+  //   @ApiProperty({
+  //     required: false,
+  //     type: 'array',
+  //     items: {
+  //       type: 'object',
+  //       properties: {
+  //         level: {
+  //           type: 'string',
+  //           enum: [
+  //             'recoveryOfficer',
+  //             'library',
+  //             'staff',
+  //             'dean',
+  //             'registrationOfficer',
+  //             'chancellor',
+  //             'completed',
+  //           ],
+  //         },
+  //         userId: { type: 'number' },
+  //         approvedAt: { type: 'string', format: 'date-time' },
+  //         comment: { type: 'string' },
+  //       },
+  //     },
+  //   })
   @IsOptional()
   @IsArray()
   approvalHistory?: {
