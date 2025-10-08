@@ -77,6 +77,7 @@ export class PaymentService {
   }
   // payment_intent.succeeded
   async handleWebhook(event: Stripe.Event) {
+    console.log('Received event &&&&&&&&&&&&&&&&&&&&&&&&&&&&&', event.type);
     switch (event.type) {
       case 'checkout.session.completed':
         this.logger.log('Checkout session completed:', event.data.object);
